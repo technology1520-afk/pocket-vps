@@ -57,6 +57,69 @@ pm2 ls                       # PM2 process manager is ready
 
 ---
 
+## 🔐 SSH Access — sshd & passwords explained
+
+The installer starts **sshd** (the SSH server) on the tablet automatically, on **port 8022** (Android doesn't allow port 22 for normal apps — this is normal, not an error).
+
+### 1. Set your SSH password (on the tablet, in Termux)
+
+```bash
+passwd
+# New password: <type a password>
+# Retype new password: <same password>
+# New password was successfully set.
+```
+
+You'll use this password when connecting from your PC — **or** skip passwords entirely by adding your PC's SSH key (next section).
+
+### 2. Two ways to log in from your PC
+
+**Option A — Password (easiest):**
+```powershell
+ssh -p 8022 u0_aXXX@<tablet-ip>
+# prompts for the password you set with `passwd`
+```
+
+**Option B — SSH key (more secure, no password to type):**
+
+From your PC, push your public key to the tablet:
+```powershell
+# Windows PowerShell:
+type "$HOME\.ssh\id_ed25519.pub" | ssh -p 8022 u0_aXXX@<tablet-ip> "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+
+# macOS / Linux:
+cat ~/.ssh/id_ed25519.pub | ssh -p 8022 u0_aXXX@<tablet-ip> "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+```
+After this, `ssh -p 8022 u0_aXXX@<tablet-ip>` logs straight in — no password.
+
+### 3. If SSH stops responding ("Connection refused")
+
+Android sometimes kills sshd in the background. Fix in 5 seconds — open **Termux on the tablet** and type:
+
+```bash
+sshd
+```
+
+That's it — the keeper scripts will also auto-restart sshd within 30s, but typing `sshd` works instantly. (If you just restarted the tablet, open Termux once — the boot script auto-starts everything.)
+
+### 4. Changing / resetting the password later
+
+```bash
+passwd              # on the tablet in Termux — set a new one
+```
+
+> ⚠️ **After changing SSH config** (not the password), restart sshd **from the tablet screen**, not over SSH: `pkill sshd; sshd` — restarting over SSH kills your own connection. Password changes don't need a restart.
+
+### 5. Inside Debian (the second layer)
+
+The Debian container also runs its own sshd (port 8023, managed by the `debian-sshd` keeper). You normally don't need it — just hop in from Termux:
+
+```bash
+proot-distro login debian
+```
+
+---
+
 ## 🤖 Adding AI Agents
 
 Your agents live in `/root/vps/agents/` inside Debian. Example — run a Node.js bot:
