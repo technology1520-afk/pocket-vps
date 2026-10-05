@@ -1,18 +1,18 @@
 #!/data/data/com.termux/files/usr/bin/bash
 ###############################################
-#  TABLET VPS ONE-LINE INSTALLER
+#  POCKET VPS ONE-LINE INSTALLER
 #  Turns a fresh Termux (Android) into a 24/7
 #  headless VPS: Debian proot + Node.js + PM2
 #  + SSH + keepers + log rotation.
 #
 #  Install from anywhere:
-#    curl -fsSL https://raw.githubusercontent.com/technology1520-afk/tablet-vps/main/install.sh | bash
+#    curl -fsSL https://raw.githubusercontent.com/technology1520-afk/pocket-vps/main/install.sh | bash
 ###############################################
 set -e
 
 echo ""
 echo "=============================================="
-echo "   TABLET VPS INSTALLER v1.0"
+echo "   POCKET VPS INSTALLER v1.0"
 echo "   Termux -> Debian proot VPS + PM2"
 echo "=============================================="
 

@@ -31,7 +31,7 @@ Get it from **[F-Droid](https://f-droid.org/packages/com.termux/)** or [GitHub R
 ### Step 2 — Open Termux and paste this ONE line:
 
 ```bash
-pkg install -y curl && curl -fsSL https://raw.githubusercontent.com/technology1520-afk/tablet-vps/main/install.sh | bash
+pkg install -y curl && curl -fsSL https://raw.githubusercontent.com/technology1520-afk/pocket-vps/main/install.sh | bash
 ```
 
  ☕ Grab a coffee — it downloads Debian, Node.js 22, PM2 and sets everything up (~5-10 min depending on internet).
@@ -141,7 +141,7 @@ pm2 save                    # make the process list survive reboots
 
 ```bash
 # in Termux:
-bash <(curl -fsSL https://raw.githubusercontent.com/technology1520-afk/tablet-vps/main/uninstall.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/technology1520-afk/pocket-vps/main/uninstall.sh)
 ```
 
 ---
