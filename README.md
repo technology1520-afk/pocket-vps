@@ -1,4 +1,4 @@
-# 📱➜🖥️ Tablet VPS
+# 📱➜🖥️ Pocket VPS
 
 **Turn any Android phone or tablet into a real 24/7 Debian Linux server — in about 10 minutes, with one command. No root. No custom ROM. No risk of bricking.**
 
@@ -18,48 +18,73 @@ This repo contains everything needed to convert a spare Android device into a **
 
 The exact setup is running 24/7 on a Samsung Galaxy Tab A11.
 
+> 🆕 **Never used a terminal before?** No problem — every command below can be copy-pasted. Nothing here needs root, and nothing can break your device.
+
 ---
 
 ## ⚡ Quick Install (3 steps)
 
 ### Step 1 — Install Termux on the Android device
 
-Get it from **[F-Droid](https://f-droid.org/packages/com.termux/)** or [GitHub Releases](https://github.com/termux/termux-app/releases).
+1. On the Android device, open the browser and go to **[F-Droid Termux page](https://f-droid.org/packages/com.termux/)** (or [GitHub Releases](https://github.com/termux/termux-app/releases))
+2. Download and install the APK (allow "install from unknown sources" if asked)
 
-> ⚠️ **Never** use the Play Store version — it's outdated and broken.
+> ⚠️ **Never** use the Play Store version — it's outdated and broken. This is the #1 mistake beginners make.
 
-### Step 2 — Open Termux and paste this ONE line:
+### Step 2 — Open Termux and paste this ONE line
+
+Open the Termux app, then **long-press anywhere on the black screen → Paste**, and press Enter:
 
 ```bash
 pkg install -y curl && curl -fsSL https://raw.githubusercontent.com/technology1520-afk/pocket-vps/main/install.sh | bash
 ```
 
- ☕ Grab a coffee — it downloads Debian, Node.js 22, PM2 and sets everything up (~5-10 min depending on internet).
+☕ Grab a coffee — it downloads Debian, Node.js 22, PM2 and sets everything up (~5-10 min depending on internet). You'll see progress text scroll by; that's normal.
 
-### Step 3 — Connect from your PC
+> 💡 **How to paste in Termux:** long-press on the screen → **Paste**. (Ctrl+V doesn't work — Termux has its own menu.)
 
-When the installer finishes it prints your tablet's **IP** and **username**. From your PC:
+### Step 3 — Set a password & connect from your PC
+
+**3a. On the tablet (in Termux), set a password:**
+
+```bash
+passwd
+```
+You'll be asked to type a password twice (the screen shows nothing while typing — that's normal, just type it).
+
+**3b. Find your tablet's IP address** — the installer prints it at the end. Missed it? Type this in Termux:
+
+```bash
+ifconfig wlan0 | grep 'inet '
+```
+Look for something like `inet 192.168.1.42` — that number is your tablet's IP.
+
+**3c. From your PC, connect:**
 
 ```powershell
 # Windows PowerShell / macOS / Linux:
-ssh -p 8022 u0_aXXX@192.168.1.XX     # ← use the IP/username the installer printed
-# password = the Termux password you set (run `passwd` in Termux to set one)
+ssh -p 8022 u0_aXXX@192.168.1.42
+#  ↑ replace u0_aXXX with the username the installer printed
+#  ↑ replace 192.168.1.42 with YOUR tablet's IP from step 3b
+# password = the one you set in 3a
 ```
 
-Then hop into the Debian server:
+**3d. Enter the Debian server:**
 
 ```bash
 proot-distro login debian    # you are now ROOT in a full Debian 13 system
 pm2 ls                       # PM2 process manager is ready
 ```
 
-> 💡 **Set a password first** (in Termux): run `passwd` so SSH login works.
+🎉 **Done — your tablet is now a Linux server.** Keep reading to add agents, or jump to [Troubleshooting](#%EF%B8%8F-troubleshooting) if something didn't work.
 
 ---
 
 ## 🔐 SSH Access — sshd & passwords explained
 
-The installer starts **sshd** (the SSH server) on the tablet automatically, on **port 8022** (Android doesn't allow port 22 for normal apps — this is normal, not an error).
+The installer starts **sshd** (the SSH server) on the tablet automatically, on **port 8022**. 
+
+> ❓ **Why port 8022 and not 22?** Android doesn't allow normal apps to use port 22. This is normal, not an error — just remember to always add `-p 8022` when connecting.
 
 ### 1. Set your SSH password (on the tablet, in Termux)
 
@@ -90,6 +115,8 @@ type "$HOME\.ssh\id_ed25519.pub" | ssh -p 8022 u0_aXXX@<tablet-ip> "mkdir -p ~/.
 # macOS / Linux:
 cat ~/.ssh/id_ed25519.pub | ssh -p 8022 u0_aXXX@<tablet-ip> "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
 ```
+> Don't have a key on your PC yet? Generate one first: `ssh-keygen -t ed25519` (press Enter through all the questions).
+
 After this, `ssh -p 8022 u0_aXXX@<tablet-ip>` logs straight in — no password.
 
 ### 3. If SSH stops responding ("Connection refused")
@@ -197,6 +224,9 @@ pm2 save                    # make the process list survive reboots
 | Tablet IP changed after router reboot | Set a DHCP reservation on your router for the tablet |
 | Everything frozen | Open Termux on the tablet once → `pm2 resurrect` → all processes return |
 | Agent keeps crashing | `pm2 logs <name>` to see why; check RAM with `pm2 monit` |
+| Typing feels weird / no paste option | Long-press the screen → Paste; also try the extra-key row (CTRL, etc.) |
+
+**Golden rule:** the tablet must stay awake (screen can be off, but Termux alive) and plugged in for 24/7 use. If everything ever seems dead — open Termux once, everything comes back.
 
 ---
 
